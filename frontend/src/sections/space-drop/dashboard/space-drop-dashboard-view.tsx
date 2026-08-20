@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState, type UIEvent } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { alpha } from '@mui/material/styles';
+import LoadingButton from '@mui/lab/LoadingButton';
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import ButtonBase from '@mui/material/ButtonBase';
@@ -17,6 +19,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Iconify from 'src/components/iconify';
 import { liquidGlass } from 'src/theme/css';
+import { createFinanceHandoff } from '../auth/space-drop-auth-api';
 import { SPACE_DROPS, type SpaceDropItem } from '../data';
 
 const PAGE_COUNT = 2;
@@ -74,6 +77,37 @@ export default function SpaceDropDashboardView() {
   const pagerRef = useRef<HTMLDivElement | null>(null);
   const [activePage, setActivePage] = useState(0);
   const [selectedDrop, setSelectedDrop] = useState<SpaceDropItem | null>(null);
+  const [launching, setLaunching] = useState(false);
+  const [launchError, setLaunchError] = useState('');
+
+  const closeDrop = useCallback(() => {
+    if (launching) return;
+    setSelectedDrop(null);
+    setLaunchError('');
+  }, [launching]);
+
+  const launchDrop = useCallback(async () => {
+    if (!selectedDrop?.href) return;
+    try {
+      setLaunching(true);
+      setLaunchError('');
+      if (selectedDrop.id !== 'z01') {
+        window.location.assign(selectedDrop.href);
+        return;
+      }
+      const accessToken = sessionStorage.getItem('accessToken');
+      if (!accessToken || accessToken.endsWith('.demo')) {
+        throw new Error('identity_session_required');
+      }
+      const handoff = await createFinanceHandoff(accessToken);
+      const destination = new URL(selectedDrop.href, window.location.href);
+      destination.hash = new URLSearchParams({ handoff: handoff.handoff_token }).toString();
+      window.location.assign(destination.toString());
+    } catch {
+      setLaunching(false);
+      setLaunchError('Сессия не подтверждена. Войдите по номеру телефона и попробуйте снова.');
+    }
+  }, [selectedDrop]);
 
   const goToPage = useCallback(
     (page: number) => {
@@ -339,7 +373,7 @@ export default function SpaceDropDashboardView() {
 
       <Dialog
         open={Boolean(selectedDrop)}
-        onClose={() => setSelectedDrop(null)}
+        onClose={closeDrop}
         fullWidth
         maxWidth="sm"
         aria-labelledby="drop-dialog-title"
@@ -355,12 +389,17 @@ export default function SpaceDropDashboardView() {
                   </Typography>
                   <Typography variant="h3">{selectedDrop.name}</Typography>
                 </Box>
-                <IconButton aria-label="Закрыть" onClick={() => setSelectedDrop(null)}>
+                <IconButton aria-label="Закрыть" onClick={closeDrop} disabled={launching}>
                   <Iconify icon="mingcute:close-line" />
                 </IconButton>
               </Stack>
             </DialogTitle>
             <DialogContent>
+              {!!launchError && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {launchError}
+                </Alert>
+              )}
               <Box
                 sx={(theme) => ({
                   ...liquidGlass({ theme, blurred: true, blurStrength: 'surface' }),
@@ -387,19 +426,19 @@ export default function SpaceDropDashboardView() {
                 variant="outlined"
                 sx={{ mr: 'auto' }}
               />
-              <Button color="inherit" onClick={() => setSelectedDrop(null)}>
+              <Button color="inherit" onClick={closeDrop} disabled={launching}>
                 Закрыть
               </Button>
               {selectedDrop.href && (
-                <Button
-                  component="a"
-                  href={selectedDrop.href}
+                <LoadingButton
                   variant="contained"
                   color="inherit"
+                  loading={launching}
+                  onClick={launchDrop}
                   endIcon={<Iconify icon="solar:arrow-right-up-linear" />}
                 >
                   Открыть
-                </Button>
+                </LoadingButton>
               )}
             </DialogActions>
           </>

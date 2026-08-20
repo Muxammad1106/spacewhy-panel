@@ -14,16 +14,6 @@ export type SpaceDropItem = {
 export const SPACE_DROPS: SpaceDropItem[] = [
   {
     id: 'z01',
-    name: 'Бронирование',
-    summary: 'Запись и бронирование для любого бизнеса.',
-    description:
-      'Единое пространство для расписания, услуг, клиентов и напоминаний. Подойдёт салону, врачу, преподавателю, студии или любой команде, которая работает по записи.',
-    release: 'Скоро',
-    status: 'soon',
-    icon: 'solar:calendar-mark-bold-duotone',
-  },
-  {
-    id: 'z02',
     name: 'Финансы',
     summary: 'Доходы, расходы и баланс без сложной бухгалтерии.',
     description:
@@ -32,6 +22,16 @@ export const SPACE_DROPS: SpaceDropItem[] = [
     status: 'available',
     icon: 'solar:wallet-money-bold-duotone',
     href: process.env.NEXT_PUBLIC_FINANCE_URL || 'https://finance.spacewhy.uz',
+  },
+  {
+    id: 'z02',
+    name: 'Бронирование',
+    summary: 'Запись и бронирование для любого бизнеса.',
+    description:
+      'Единое пространство для расписания, услуг, клиентов и напоминаний. Подойдёт салону, врачу, преподавателю, студии или любой команде, которая работает по записи.',
+    release: 'Скоро',
+    status: 'soon',
+    icon: 'solar:calendar-mark-bold-duotone',
   },
   {
     id: 'z03',

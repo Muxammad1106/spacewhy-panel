@@ -17,6 +17,11 @@ export type PhoneChallenge = {
   status: 'accepted';
 };
 
+export type SessionHandoff = {
+  handoff_token: string;
+  expires_at: string;
+};
+
 const API_BASE_URL = (
   process.env.NEXT_PUBLIC_SPACE_DROP_API_URL || 'http://localhost:8000/api/v1'
 ).replace(/\/$/, '');
@@ -55,5 +60,13 @@ export function verifyPhoneChallenge(challengeId: string, code: string): Promise
 export function getPanelPrincipal(accessToken: string): Promise<PanelPrincipal> {
   return request('/identity/me', {
     headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export function createFinanceHandoff(accessToken: string): Promise<SessionHandoff> {
+  return request('/identity/session-handoffs', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ target: 'finance' }),
   });
 }

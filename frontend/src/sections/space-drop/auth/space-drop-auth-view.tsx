@@ -59,6 +59,7 @@ export default function SpaceDropAuthView() {
   const [stage, setStage] = useState<AuthStage>('phone');
   const [challengeId, setChallengeId] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [isResending, setIsResending] = useState(false);
 
   const methods = useForm<FormValues>({
     resolver: yupResolver(stage === 'phone' ? PhoneSchema : CodeSchema),
@@ -126,6 +127,20 @@ export default function SpaceDropAuthView() {
     [auth, challengeId, clearErrors, router, stage]
   );
 
+  const resendCode = useCallback(async () => {
+    try {
+      setIsResending(true);
+      setErrorMessage('');
+      const challenge = await requestPhoneChallenge(phone);
+      setChallengeId(challenge.challenge_id);
+      resetField('code');
+    } catch (error) {
+      setErrorMessage(authErrorMessage(error));
+    } finally {
+      setIsResending(false);
+    }
+  }, [phone, resetField]);
+
   return (
     <Box
       component="main"
@@ -180,8 +195,8 @@ export default function SpaceDropAuthView() {
             sx={{ mt: 1.5, mb: 3.5, maxWidth: 430 }}
           >
             {stage === 'phone'
-              ? 'Укажите номер, который вы подтвердили в боте Space Drop.'
-              : `Бот отправил шестизначный код для номера ${phone.trim() || '+998'}.`}
+              ? 'Введите номер телефона. Код для входа придёт сообщением от Telegram-бота.'
+              : `Код отправлен в Telegram для номера ${phone.trim() || '+998'}. Если это первый вход, сначала поделитесь своим контактом с ботом.`}
           </Typography>
 
           <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -247,7 +262,7 @@ export default function SpaceDropAuthView() {
                     <Box sx={{ minWidth: 0 }}>
                       <Typography variant="subtitle2">Проверьте Telegram</Typography>
                       <Typography variant="caption" color="text.secondary">
-                        Сообщение от бота содержит код для входа
+                        Не получили код? Откройте бота, поделитесь контактом и отправьте код ещё раз
                       </Typography>
                     </Box>
                   </Box>
@@ -305,6 +320,20 @@ export default function SpaceDropAuthView() {
                   <Button
                     type="button"
                     color="inherit"
+                    disabled={isResending}
+                    onClick={resendCode}
+                    startIcon={
+                      <Iconify
+                        icon={isResending ? 'svg-spinners:ring-resize' : 'solar:refresh-linear'}
+                      />
+                    }
+                    sx={{ minHeight: 44, color: 'text.secondary' }}
+                  >
+                    Отправить код ещё раз
+                  </Button>
+                  <Button
+                    type="button"
+                    color="inherit"
                     onClick={changePhone}
                     startIcon={<Iconify icon="solar:arrow-left-linear" />}
                     sx={{ minHeight: 44, color: 'text.secondary' }}
@@ -340,7 +369,7 @@ export default function SpaceDropAuthView() {
             <Typography variant="overline" color="text.secondary">
               ПЕРВЫЙ DROP
             </Typography>
-            <Chip label="СКОРО" size="small" variant="outlined" />
+            <Chip label={FIRST_DROP.release.toUpperCase()} size="small" variant="outlined" />
           </Stack>
           <Box sx={{ textAlign: 'center' }}>
             <Box
