@@ -1,0 +1,15 @@
+{
+  "name": "Space Drop by Space Why",
+  "short_name": "Space Drop",
+  "display": "standalone",
+  "start_url": "/",
+  "theme_color": "#000000",
+  "background_color": "#020203",
+  "icons": [
+    {
+      "src": "brand/spacewhy/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
