@@ -25,7 +25,8 @@ import { requestPhoneChallenge, verifyPhoneChallenge } from './space-drop-auth-a
 
 type AuthStage = 'phone' | 'code';
 type FormValues = { phone: string; code: string };
-const authBotUrl = process.env.NEXT_PUBLIC_SPACE_DROP_AUTH_BOT_URL;
+const authBotUrl =
+  process.env.NEXT_PUBLIC_SPACE_DROP_AUTH_BOT_URL || 'https://t.me/Auth_Spacewhy_bot';
 
 const PhoneSchema = Yup.object({
   phone: Yup.string()
@@ -314,7 +315,7 @@ export default function SpaceDropAuthView() {
                       startIcon={<Iconify icon="mingcute:telegram-line" />}
                       sx={{ minHeight: 44, color: 'text.secondary' }}
                     >
-                      Открыть бота
+                      Открыть Auth.Spacewhy
                     </Button>
                   )}
                   <Button
