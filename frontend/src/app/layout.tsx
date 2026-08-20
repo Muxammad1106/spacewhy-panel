@@ -48,38 +48,27 @@ import { AuthProvider } from 'src/auth/context/jwt';
 export const metadata = {
   title: SPACEWHY_BRAND.productName,
   description:
-    'Spacewhy Liquid Glass UI Kit — a complete light and dark Material UI dashboard and component system.',
-  keywords: 'spacewhy,react,material,ui kit,liquid glass,dashboard,admin,template',
+    'Space Drop — коллекция полезных инструментов Spacewhy для ежедневных задач.',
+  keywords: 'space drop,spacewhy,tools,productivity,liquid glass,dashboard',
   themeColor: '#020203',
   manifest: '/manifest.json',
-  icons: [
-    {
-      rel: 'icon',
-      type: 'image/svg+xml',
-      url: '/favicon.svg',
-    },
-    {
-      rel: 'icon',
-      url: '/favicon/favicon.ico',
-    },
-    {
-      rel: 'icon',
-      type: 'image/png',
-      sizes: '16x16',
-      url: '/favicon/favicon-16x16.png',
-    },
-    {
-      rel: 'icon',
-      type: 'image/png',
-      sizes: '32x32',
-      url: '/favicon/favicon-32x32.png',
-    },
-    {
-      rel: 'apple-touch-icon',
-      sizes: '180x180',
-      url: '/favicon/apple-touch-icon.png',
-    },
-  ],
+  icons: {
+    icon: [
+      {
+        type: 'image/png',
+        sizes: '512x512',
+        url: '/brand/spacewhy/logo.png',
+      },
+    ],
+    apple: [
+      {
+        type: 'image/png',
+        sizes: '512x512',
+        url: '/brand/spacewhy/logo.png',
+      },
+    ],
+    shortcut: '/brand/spacewhy/logo.png',
+  },
 };
 
 type Props = {
@@ -88,7 +77,7 @@ type Props = {
 
 export default function RootLayout({ children }: Props) {
   return (
-    <html lang="en" className={primaryFont.className}>
+    <html lang="ru" className={primaryFont.className}>
       <body>
         <AuthProvider>
           <LocalizationProvider>

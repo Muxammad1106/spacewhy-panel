@@ -1,12 +1,11 @@
-// sections
-import { OverviewAppView } from 'src/sections/overview/app/view';
+import SpaceDropDashboardView from 'src/sections/space-drop/dashboard/space-drop-dashboard-view';
 
 // ----------------------------------------------------------------------
 
 export const metadata = {
-  title: 'Dashboard: App',
+  title: 'Панель · Space Drop',
 };
 
 export default function OverviewAppPage() {
-  return <OverviewAppView />;
+  return <SpaceDropDashboardView />;
 }

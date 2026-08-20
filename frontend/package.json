@@ -1,8 +1,8 @@
 {
-  "name": "ui-kit-spacewhy",
+  "name": "space-drop",
   "author": "Spacewhy",
   "version": "5.0.0",
-  "description": "Complete Spacewhy Liquid Glass dashboard and component system",
+  "description": "Space Drop client platform powered by the Spacewhy Liquid Glass UI Kit",
   "private": true,
   "scripts": {
     "dev": "next dev -p 8081",

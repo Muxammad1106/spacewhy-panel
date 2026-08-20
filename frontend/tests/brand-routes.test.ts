@@ -16,9 +16,9 @@ const collectStrings = (value: unknown): string[] => {
   return Object.values(value).flatMap(collectStrings);
 };
 
-test('brand configuration exposes a complete Spacewhy identity contract', () => {
-  assert.equal(SPACEWHY_BRAND.productName, 'Spacewhy UI Kit');
-  assert.equal(SPACEWHY_BRAND.shortName, 'Spacewhy');
+test('brand configuration exposes a complete Space Drop identity contract', () => {
+  assert.equal(SPACEWHY_BRAND.productName, 'Space Drop');
+  assert.equal(SPACEWHY_BRAND.shortName, 'Space Drop');
   assert.equal(SPACEWHY_BRAND.websiteUrl, 'https://spacewhy.uz');
   assert.equal(SPACEWHY_BRAND.contactEmail.endsWith('@spacewhy.uz'), true);
   assert.equal(SPACEWHY_BRAND.supportEmail.endsWith('@spacewhy.uz'), true);
@@ -39,6 +39,9 @@ test('route constants stay internal except for the explicit public website', () 
 });
 
 test('dynamic route builders preserve the expected route hierarchy', () => {
+  assert.equal(paths.login, '/login');
+  assert.equal(paths.register, '/register');
+  assert.equal(paths.dashboard.profile, '/dashboard/profile');
   assert.equal(paths.product.details('product-id'), '/product/product-id');
   assert.equal(paths.post.details('Glass System'), '/post/glass-system');
   assert.equal(paths.dashboard.user.edit('user-id'), '/dashboard/user/user-id/edit');

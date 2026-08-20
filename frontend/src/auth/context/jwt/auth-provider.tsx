@@ -6,6 +6,7 @@ import axios, { API_ENDPOINTS } from 'src/utils/axios';
 import { _mock } from 'src/_mock';
 import { SPACEWHY_BRAND } from 'src/brand/brand-config';
 import { shouldUseLocalDemoApi } from 'src/utils/demo-api-mode';
+import { getPanelPrincipal } from 'src/sections/space-drop/auth/space-drop-auth-api';
 //
 import { AuthContext } from './auth-context';
 import { isValidToken, setSession } from './utils';
@@ -79,7 +80,7 @@ const reducer = (state: AuthStateType, action: ActionsType) => {
 // ----------------------------------------------------------------------
 
 const STORAGE_KEY = 'accessToken';
-const DEMO_USER_STORAGE_KEY = 'spacewhyDemoUser';
+const DEMO_USER_STORAGE_KEY = 'spaceDropDemoUser';
 const useLocalDemoAuth = shouldUseLocalDemoApi(process.env.NEXT_PUBLIC_USE_REMOTE_DEMO_API);
 
 const DEMO_CREDENTIALS = {
@@ -88,8 +89,8 @@ const DEMO_CREDENTIALS = {
 };
 
 const DEMO_USER: AuthUserType = {
-  id: 'spacewhy-demo-user',
-  displayName: 'Spacewhy Demo',
+  id: 'space-drop-demo-user',
+  displayName: 'Muxammad Chariev',
   email: DEMO_CREDENTIALS.email,
   photoURL: _mock.image.avatar(24),
   phoneNumber: '+998 90 000 00 00',
@@ -98,7 +99,7 @@ const DEMO_USER: AuthUserType = {
   state: 'Tashkent',
   city: 'Tashkent',
   zipCode: '100000',
-  about: 'Spacewhy UI Kit demo account.',
+  about: 'Space Drop local demo account.',
   role: 'admin',
   isPublic: true,
 };
@@ -131,6 +132,35 @@ const storeDemoUser = (user: AuthUserType) => {
   sessionStorage.setItem(DEMO_USER_STORAGE_KEY, JSON.stringify(user));
 };
 
+const createIdentityDemoUser = (identity: string): AuthUserType => {
+  const unifiedUser: AuthUserType = {
+    ...(getStoredDemoUser() || DEMO_USER),
+    id: 'space-drop-unified-user',
+    displayName: DEMO_USER.displayName,
+    email: DEMO_USER.email,
+    role: 'user',
+    about: 'Unified Space Drop demo account for phone and Telegram sign-in.',
+  };
+
+  if (identity.startsWith('phone:')) {
+    const phoneNumber = identity.slice('phone:'.length);
+
+    return {
+      ...unifiedUser,
+      phoneNumber,
+    };
+  }
+
+  if (identity.startsWith('telegram:')) {
+    return unifiedUser;
+  }
+
+  return {
+    ...unifiedUser,
+    displayName: identity.split('@')[0] || unifiedUser.displayName,
+  };
+};
+
 type Props = {
   children: React.ReactNode;
 };
@@ -156,13 +186,14 @@ export function AuthProvider({ children }: Props) {
           return;
         }
 
-        const response = await axios.get(API_ENDPOINTS.auth.me);
-
-        const { user } = response.data;
-
-        if (!user) {
-          throw new Error('Invalid authentication response');
-        }
+        const principal = await getPanelPrincipal(accessToken);
+        const user: NonNullable<AuthUserType> = {
+          id: principal.id,
+          displayName: principal.display_name || 'Пользователь Space Drop',
+          locale: principal.locale,
+          role: 'user',
+          isPublic: false,
+        };
 
         dispatch({
           type: Types.INITIAL,
@@ -197,6 +228,19 @@ export function AuthProvider({ children }: Props) {
     }
   }, []);
 
+  const loginWithSession = useCallback(
+    async (accessToken: string, user: NonNullable<AuthUserType>) => {
+      if (!isValidToken(accessToken)) {
+        throw new Error('Invalid authentication response');
+      }
+
+      setSession(accessToken);
+      storeDemoUser(user);
+      dispatch({ type: Types.LOGIN, payload: { user } });
+    },
+    []
+  );
+
   useEffect(() => {
     initialize();
   }, [initialize]);
@@ -210,9 +254,8 @@ export function AuthProvider({ children }: Props) {
       accessToken = createDemoToken();
       user = DEMO_USER;
     } else if (useLocalDemoAuth) {
-      throw new Error(
-        `Use ${DEMO_CREDENTIALS.email} with password ${DEMO_CREDENTIALS.password}, or create a local demo account.`
-      );
+      accessToken = createDemoToken();
+      user = createIdentityDemoUser(email);
     } else {
       const response = await axios.post(API_ENDPOINTS.auth.login, { email, password });
 
@@ -244,11 +287,11 @@ export function AuthProvider({ children }: Props) {
         accessToken = createDemoToken();
         user = {
           ...DEMO_USER,
-          id: 'spacewhy-local-user',
+          id: 'space-drop-local-user',
           displayName: `${firstName} ${lastName}`.trim(),
           email,
           role: 'user',
-          about: 'Local Spacewhy UI Kit demo account.',
+          about: 'Local Space Drop demo account.',
         };
       } else {
         const response = await axios.post(API_ENDPOINTS.auth.register, {
@@ -302,10 +345,11 @@ export function AuthProvider({ children }: Props) {
       unauthenticated: status === 'unauthenticated',
       //
       login,
+      loginWithSession,
       register,
       logout,
     }),
-    [login, logout, register, state.user, status]
+    [login, loginWithSession, logout, register, state.user, status]
   );
 
   return <AuthContext.Provider value={memoizedValue}>{children}</AuthContext.Provider>;

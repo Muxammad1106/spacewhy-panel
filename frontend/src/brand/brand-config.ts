@@ -1,6 +1,6 @@
 export const SPACEWHY_BRAND = {
-  productName: 'Spacewhy UI Kit',
-  shortName: 'Spacewhy',
+  productName: 'Space Drop',
+  shortName: 'Space Drop',
   companyName: 'Spacewhy',
   websiteUrl: 'https://spacewhy.uz',
   documentationUrl: '/components',
@@ -9,6 +9,6 @@ export const SPACEWHY_BRAND = {
   contactEmail: 'hello@spacewhy.uz',
   supportEmail: 'support@spacewhy.uz',
   demoEmail: 'demo@spacewhy.uz',
-  editorId: 'spacewhy-editor',
-  version: '5.0.0',
+  editorId: 'space-drop-editor',
+  version: '0.1.0',
 } as const;
