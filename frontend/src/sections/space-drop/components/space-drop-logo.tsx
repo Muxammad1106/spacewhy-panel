@@ -22,6 +22,7 @@ export default function SpaceDropLogo({ compact = false, disabledLink = false, s
         <Box>
           <Typography
             component="span"
+            suppressHydrationWarning
             sx={{
               display: 'block',
               fontFamily: secondaryFont.style.fontFamily,
@@ -35,6 +36,7 @@ export default function SpaceDropLogo({ compact = false, disabledLink = false, s
           </Typography>
           <Typography
             component="span"
+            suppressHydrationWarning
             variant="caption"
             sx={{ color: 'text.secondary', letterSpacing: '0.08em' }}
           >
