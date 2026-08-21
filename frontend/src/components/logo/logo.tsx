@@ -17,6 +17,7 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
       <Box
         ref={ref}
         component="div"
+        suppressHydrationWarning
         aria-label="Spacewhy"
         sx={{
           width: 40,

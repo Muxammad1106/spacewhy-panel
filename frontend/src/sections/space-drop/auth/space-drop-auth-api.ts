@@ -14,6 +14,7 @@ export type PanelSession = {
 export type PhoneChallenge = {
   challenge_id: string;
   expires_at: string;
+  telegram_start_parameter: string;
   status: 'accepted';
 };
 
@@ -48,6 +49,15 @@ export function requestPhoneChallenge(phone: string): Promise<PhoneChallenge> {
     method: 'POST',
     body: JSON.stringify({ phone }),
   });
+}
+
+export function buildAuthBotDeepLink(botUrl: string, startParameter: string): string {
+  if (!/^login_[0-9a-f]{32}$/.test(startParameter)) {
+    throw new Error('space_drop_auth_invalid_start_parameter');
+  }
+  const url = new URL(botUrl);
+  url.searchParams.set('start', startParameter);
+  return url.toString();
 }
 
 export function verifyPhoneChallenge(challengeId: string, code: string): Promise<PanelSession> {
